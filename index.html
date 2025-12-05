@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 2학기 기말고사 플래너</title>
+    
+    <!-- Tailwind CSS (스타일링) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 폰트 설정 (Noto Sans KR) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+    </style>
+
+    <!-- React 및 라이브러리 로드 (Import Map 방식) -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "lucide-react": "https://esm.sh/lucide-react@0.292.0"
+        }
+    }
+    </script>
+    
+    <!-- Babel (JSX 변환용) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { CheckCircle2, Circle, BookOpen, Clock, Calendar, Trophy, AlertCircle, Moon, Zap, Flag, PartyPopper } from 'lucide-react';
+
+        const StudyPlan = () => {
+            // 사용자가 제공한 상세 계획 데이터 (12/5 ~ 12/12)
+            const initialPlan = [
+                {
+                id: 1,
+                date: "12월 5일 (금)",
+                title: "자바 기초 & 상속 집중",
+                tasks: [
+                    { subject: "자바", time: "1시간 20분", content: "노트 작성(구조,객체,메서드) + 상속 개념/예제 손코딩 + 예제 주석 달기", isHighlight: true, completed: false },
+                    { subject: "수학", time: "1시간", content: "★ 개념 노트 만들기 (오늘 범위) + 쎈 15문제", isHighlight: false, completed: false },
+                    { subject: "영어", time: "30분", content: "단어 30개 + 문법 공식 3개 정리", isHighlight: false, completed: false },
+                    { subject: "일문", time: "20분", content: "일본어 노트 정리/암기 + 히라가나 절반 쓰기", isHighlight: false, completed: false },
+                    { subject: "루틴", time: "자기 전", content: "영단어 + 자바 개념 10분 훑기", isHighlight: false, completed: false, isRoutine: true },
+                ]
+                },
+                {
+                id: 2,
+                date: "12월 6일 (토)",
+                title: "추상클래스/인터페이스 & 오답",
+                tasks: [
+                    { subject: "자바", time: "1시간 30분", content: "추상 vs 인터페이스 비교표 작성 + 예시 코드 작성", isHighlight: true, completed: false },
+                    { subject: "수학", time: "1시간 20분", content: "쎈 20문제 풀이 + 오답노트 별도 작성", isHighlight: false, completed: false },
+                    { subject: "영어", time: "40분", content: "단어 40개 + 문법 문제 10문제", isHighlight: false, completed: false },
+                    { subject: "한국사", time: "30분", content: "프린트 정독 + 빈칸 채우기 연습", isHighlight: false, completed: false },
+                    { subject: "루틴", time: "밤", content: "자바 코드 다시보기 + 단어 복습", isHighlight: false, completed: false, isRoutine: true },
+                ]
+                },
+                {
+                id: 3,
+                date: "12월 7일 (일)",
+                title: "컬렉션/제네릭 & 실전 암기",
+                tasks: [
+                    { subject: "자바", time: "1시간 30분", content: "Enum/제네릭 정리 + 컬렉션(List/Set/Map) 암기 및 코드작성", isHighlight: true, completed: false },
+                    { subject: "수학", time: "1시간", content: "자주 틀린 유형 10문제 다시 풀기", isHighlight: false, completed: false },
+                    { subject: "영어", time: "40분", content: "독해 1지문 + 단어 복습(80개↑)", isHighlight: false, completed: false },
+                    { subject: "일문", time: "30분", content: "노트 암기 + 히라가나 전체 테스트 (틀린 글자 체크)", isHighlight: false, completed: false },
+                    { subject: "한국사", time: "40분", content: "프린트 정독 + 빈칸 채우기 연습", isHighlight: false, completed: false },
+                ]
+                },
+                {
+                id: 4,
+                date: "12월 8일 (월)",
+                title: "D-1 최종 복습 (밤 11시 취침)",
+                tasks: [
+                    { subject: "자바", time: "1시간", content: "목차 훑기 + 상속/인터페이스/컬렉션 재정리 + 문법 체크", isHighlight: true, completed: false },
+                    { subject: "수학", time: "40분", content: "공식 암기 + 오답노트 문제 풀이", isHighlight: false, completed: false },
+                    { subject: "영어", time: "30분", content: "전체 단어 훑기 + 문법 노트", isHighlight: false, completed: false },
+                    { subject: "일문", time: "20분", content: "노트 암기 + 히라가나 최종 점검", isHighlight: false, completed: false },
+                    { subject: "한국사", time: "20분", content: "프린트 정독 + 빈칸 채우기 연습", isHighlight: false, completed: false },
+                    { subject: "공국", time: "30분", content: "클룸 + 교과서 학습", isHighlight: false, completed: false },
+                ]
+                },
+                {
+                id: 5,
+                date: "12월 9일 (화)",
+                title: "수학 시험 후 벼락치기",
+                tasks: [
+                    { subject: "자바", time: "50분", content: "상속/인터페이스 개념 재정리 + 부모-자식 예제 코드 2개 작성", isHighlight: true, completed: false },
+                    { subject: "영어", time: "40분", content: "시험 범위 단어 전체 복습 + 헷갈린 단어 10개 암기", isHighlight: false, completed: false },
+                    { subject: "일문", time: "30분", content: "노트 암기 + 히라가나 + 기본단어 점검", isHighlight: false, completed: false },
+                    { subject: "공국", time: "20분", content: "클룸 + 교과서 훑어보기", isHighlight: false, completed: false },
+                ]
+                },
+                {
+                id: 6,
+                date: "12월 10일 (수)",
+                title: "영어/일본어 시험 후",
+                tasks: [
+                    { subject: "한국사", time: "50분", content: "프린트 정독 + 빈칸 채우기 연습", isHighlight: false, completed: false },
+                    { subject: "자바", time: "50분", content: "추상클래스/제네릭/컬렉션 정리 + List/Set/Map 차이 정리", isHighlight: true, completed: false },
+                ]
+                },
+                {
+                id: 7,
+                date: "12월 11일 (목)",
+                title: "한국사/자바 시험 후",
+                tasks: [
+                    { subject: "공국", time: "40분", content: "클룸 + 교과서 집중 암기", isHighlight: false, completed: false },
+                    { subject: "자바", time: "20분", content: "틀린 개념만 정리하고 끝", isHighlight: true, completed: false },
+                    { subject: "휴식", time: "권장", content: "내일 시험을 위해 컨디션 조절", isHighlight: false, completed: false, isRoutine: true },
+                ]
+                },
+                {
+                id: 8,
+                date: "12월 12일 (금)",
+                title: "공국 시험 후 (FINISH)",
+                tasks: [
+                    { subject: "자유", time: "Forever", content: "🧦 도비는 자유에요!! 고생 많았습니다!", isHighlight: true, completed: false },
+                ]
+                }
+            ];
+
+            const [plan, setPlan] = useState(() => {
+                try {
+                const savedPlan = localStorage.getItem('finalExamPlanv4');
+                if (savedPlan) {
+                    const parsed = JSON.parse(savedPlan);
+                    if (parsed.length < initialPlan.length) return initialPlan;
+                    return parsed;
+                }
+                return initialPlan;
+                } catch (e) {
+                console.error("Storage load failed", e);
+                return initialPlan;
+                }
+            });
+            
+            const [progress, setProgress] = useState(0);
+
+            useEffect(() => {
+                localStorage.setItem('finalExamPlanv4', JSON.stringify(plan));
+                
+                let totalTasks = 0;
+                let completedTasks = 0;
+
+                plan.forEach(day => {
+                day.tasks.forEach(task => {
+                    totalTasks++;
+                    if (task.completed) completedTasks++;
+                });
+                });
+
+                setProgress(totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100));
+            }, [plan]);
+
+            const toggleTask = (dayIndex, taskIndex) => {
+                const newPlan = [...plan];
+                newPlan[dayIndex].tasks[taskIndex].completed = !newPlan[dayIndex].tasks[taskIndex].completed;
+                setPlan(newPlan);
+            };
+
+            const resetPlan = () => {
+                if(window.confirm("정말 모든 체크리스트를 초기화하시겠습니까?")) {
+                setPlan(initialPlan);
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-50 py-8 px-4 font-sans text-slate-800">
+                <div className="max-w-4xl mx-auto">
+                    
+                    {/* 헤더 섹션 */}
+                    <header className="mb-8 text-center space-y-2">
+                    <div className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold mb-2">
+                        시험 기간: 12월 9일 ~ 12일
+                    </div>
+                    <h1 className="text-3xl font-bold text-slate-900 flex items-center justify-center gap-2">
+                        <BookOpen className="w-8 h-8 text-blue-600" />
+                        2025 2학기 기말고사 플래너
+                    </h1>
+                    <p className="text-slate-600">
+                        {'자바 > 수학 > 영어/일문 > 한국사 > 공국'}
+                    </p>
+                    </header>
+
+                    {/* 진행률 바 */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8 sticky top-4 z-10">
+                    <div className="flex justify-between items-end mb-2">
+                        <span className="font-bold text-lg text-slate-700">전체 달성률</span>
+                        <div className="flex items-center gap-4">
+                        <button onClick={resetPlan} className="text-xs text-slate-400 hover:text-red-500 underline">
+                            초기화
+                        </button>
+                        <span className="text-2xl font-black text-blue-600">{progress}%</span>
+                        </div>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-4 overflow-hidden">
+                        <div 
+                        className="bg-blue-600 h-4 rounded-full transition-all duration-500 ease-out"
+                        style={{ width: `${progress}%` }}
+                        ></div>
+                    </div>
+                    {progress === 100 && (
+                        <div className="mt-3 text-center text-green-600 font-bold animate-bounce">
+                        🎉 수고하셨습니다! 이제 진짜 자유입니다! 🎉
+                        </div>
+                    )}
+                    </div>
+
+                    {/* 일정 카드 그리드 */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {plan.map((day, dayIndex) => (
+                        <div key={day.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+                        {/* 날짜 헤더 */}
+                        <div className={`p-4 border-b border-slate-100 ${dayIndex >= 4 ? 'bg-indigo-50' : 'bg-slate-50'}`}>
+                            <h2 className="font-bold text-lg flex items-center gap-2 text-slate-800">
+                            {day.id === 8 ? <PartyPopper className="w-5 h-5 text-yellow-500" /> : 
+                            dayIndex >= 4 ? <Flag className="w-5 h-5 text-red-500" /> : 
+                            <Calendar className="w-5 h-5 text-indigo-500" />}
+                            {day.date}
+                            </h2>
+                            <p className={`text-sm mt-1 font-medium ${day.id === 8 ? 'text-yellow-600' : dayIndex >= 4 ? 'text-red-600' : 'text-indigo-600'}`}>
+                            {day.title}
+                            </p>
+                        </div>
+
+                        {/* 할 일 목록 */}
+                        <div className="p-4 space-y-3 flex-1">
+                            {day.tasks.map((task, taskIndex) => (
+                            <div 
+                                key={taskIndex}
+                                onClick={() => toggleTask(dayIndex, taskIndex)}
+                                className={`
+                                group flex items-start p-3 rounded-xl cursor-pointer transition-all border
+                                ${task.completed 
+                                    ? 'bg-slate-50 border-slate-100 opacity-60' 
+                                    : task.isRoutine 
+                                    ? 'bg-purple-50 border-purple-100 hover:border-purple-300' 
+                                    : day.id === 8 
+                                        ? 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100'
+                                        : 'bg-white border-slate-100 hover:border-blue-200 hover:bg-blue-50/30'
+                                }
+                                ${task.isHighlight && !task.completed && day.id !== 8 ? 'border-l-4 border-l-blue-500' : ''}
+                                `}
+                            >
+                                <div className={`mt-1 mr-3 transition-colors ${task.isRoutine ? 'text-purple-400' : day.id === 8 ? 'text-yellow-500' : 'text-slate-400 group-hover:text-blue-500'}`}>
+                                {task.completed ? (
+                                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                                ) : task.isRoutine ? (
+                                    <Moon className="w-5 h-5" />
+                                ) : (
+                                    <Circle className="w-5 h-5" />
+                                )}
+                                </div>
+                                
+                                <div className="flex-1">
+                                <div className="flex justify-between items-center mb-1">
+                                    <span className={`
+                                    font-bold text-xs px-2 py-0.5 rounded-full
+                                    ${task.isHighlight 
+                                        ? 'bg-blue-100 text-blue-700' 
+                                        : task.isRoutine
+                                        ? 'bg-purple-100 text-purple-700'
+                                        : 'bg-slate-100 text-slate-600'
+                                    }
+                                    `}>
+                                    {task.subject}
+                                    </span>
+                                    <span className="text-xs text-slate-400 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {task.time}
+                                    </span>
+                                </div>
+                                <p className={`text-sm ${task.completed ? 'line-through text-slate-400' : 'text-slate-700'} break-keep`}>
+                                    {task.content}
+                                </p>
+                                </div>
+                            </div>
+                            ))}
+                        </div>
+                        </div>
+                    ))}
+                    </div>
+
+                    {/* 필수 규칙 섹션 */}
+                    <div className="mt-8 bg-indigo-600 rounded-2xl p-6 text-white shadow-lg">
+                    <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
+                        <Zap className="w-6 h-6 text-yellow-300" />
+                        시험 기간 필수 규칙 (Strict Mode)
+                    </h3>
+                    <ul className="space-y-3">
+                        <li className="flex items-center gap-3">
+                        <div className="bg-white/20 p-1.5 rounded-full min-w-fit">
+                            <CheckCircle2 className="w-4 h-4 text-white" />
+                        </div>
+                        <span><strong>수학/자바</strong>는 무슨 일이 있어도 매일 하기</span>
+                        </li>
+                        <li className="flex items-center gap-3">
+                        <div className="bg-white/20 p-1.5 rounded-full min-w-fit">
+                            <CheckCircle2 className="w-4 h-4 text-white" />
+                        </div>
+                        <span>영어 단어 <strong>하루 최소 2번</strong> 눈도장 찍기</span>
+                        </li>
+                        <li className="flex items-center gap-3">
+                        <div className="bg-white/20 p-1.5 rounded-full min-w-fit">
+                            <AlertCircle className="w-4 h-4 text-white" />
+                        </div>
+                        <span><strong>핸드폰 감금!</strong> (공부할 땐 다른 방에)</span>
+                        </li>
+                        <li className="flex items-center gap-3">
+                        <div className="bg-white/20 p-1.5 rounded-full min-w-fit">
+                            <Clock className="w-4 h-4 text-white" />
+                        </div>
+                        <span>50분 공부 + 10분 휴식 리듬 지키기</span>
+                        </li>
+                    </ul>
+                    </div>
+
+                    <footer className="mt-10 text-center text-slate-400 text-sm pb-8">
+                    <p>월요일(8일)은 밤 11시 전 취침 필수!</p>
+                    <p className="mt-2">끝까지 포기하지 마세요! 할 수 있습니다!</p>
+                    </footer>
+
+                </div>
+                </div>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<StudyPlan />);
+    </script>
+</body>
+</html>
